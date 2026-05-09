@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hiresquire"
-version = "1.2.2"
+version = "1.2.3"
 description = "HireSquire SDK - AI-powered candidate screening for agents and humans"
 readme = "README.md"
 license = {text = "MIT"}
@@ -43,8 +43,8 @@ dev = [
 Homepage = "https://hiresquireai.com"
 Documentation = "https://hiresquireai.com/docs/api"
 AgentDocs = "https://hiresquireai.com/docs/agents"
-Repository = "https://github.com/hiresquire/hiresquire-python"
-Issues = "https://github.com/hiresquire/hiresquire-python/issues"
+Repository = "https://github.com/bp46/hiresquire-python"
+Issues = "https://github.com/bp46/hiresquire-python/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
