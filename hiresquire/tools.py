@@ -95,7 +95,7 @@ def _get_headers(token: Optional[str] = None, idempotency_key: Optional[str] = N
     headers = {
         "Authorization": f"Bearer {api_token}",
         "Content-Type": "application/json",
-        "User-Agent": "hiresquire-python/1.2.1"
+        "User-Agent": "hiresquire-python/1.2.2"
     }
     
     if idempotency_key:
