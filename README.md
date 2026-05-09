@@ -66,7 +66,7 @@ Set these before using the SDK:
 
 ```bash
 export HIRESQUIRE_API_TOKEN="your_api_token_here"
-export HIRESQUIRE_BASE_URL="https://api.hiresquireai.com/api/v1"  # optional
+export HIRESQUIRE_BASE_URL="https://hiresquireai.com/api/v1"  # optional
 ```
 
 ## LangChain Integration

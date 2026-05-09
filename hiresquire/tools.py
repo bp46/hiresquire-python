@@ -23,7 +23,7 @@ except ImportError:
 
 
 # Default values
-DEFAULT_BASE_URL = "https://api.hiresquireai.com/api/v1"
+DEFAULT_BASE_URL = "https://hiresquireai.com/api/v1"
 MAX_RETRIES = 3
 RETRY_DELAY = 1
 

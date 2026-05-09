@@ -25,7 +25,7 @@ Quick Start:
 
 Environment Variables:
     HIRESQUIRE_API_TOKEN: Your API token from hiresquire dashboard
-    HIRESQUIRE_BASE_URL: API base URL (default: https://api.hiresquireai.com/api/v1)
+    HIRESQUIRE_BASE_URL: API base URL (default: https://hiresquireai.com/api/v1)
 """
 
 from .tools import (
@@ -241,7 +241,7 @@ class HireSquire:
                 "or set the HIRESQUIRE_API_TOKEN environment variable."
             )
             
-        self.base_url = base_url or os.environ.get("HIRESQUIRE_BASE_URL", "https://api.hiresquireai.com/api/v1")
+        self.base_url = base_url or os.environ.get("HIRESQUIRE_BASE_URL", "https://hiresquireai.com/api/v1")
         
         # Initialize namespaces
         self.jobs = JobsNamespace(self)
