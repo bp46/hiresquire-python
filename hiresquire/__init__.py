@@ -59,7 +59,7 @@ from .tools import (
 import os
 from typing import Optional, List, Dict, Any, Union
 
-__version__ = "1.2.2"
+__version__ = "1.2.3"
 
 def _unwrap(func_or_tool):
     """Unwrap LangChain tool to underlying function, handling mocks safely."""
@@ -121,7 +121,7 @@ class CandidatesNamespace:
         return f(job_id, candidate_id, api_token=self.client.api_token, base_url=self.client.base_url, **kwargs)
 
     def compare(self, candidates: List[Dict[str, Any]], candidate_ids: List[int]) -> Dict[str, Any]:
-        """Compare candidates side-by-side."""
+        """Compare candidates side-by-side and generate AI Delta Analysis."""
         return compare_candidates(candidates, candidate_ids)
 
 

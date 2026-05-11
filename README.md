@@ -6,6 +6,17 @@
 
 Python SDK for HireSquire's AI-powered candidate screening API. Includes native LangChain and AutoGen integration.
 
+## Agent Discovery & Registries
+
+HireSquire is built natively for AI agents. Integrate HireSquire into your agentic workflows via these canonical sources:
+
+- **MCP Hubs**: [Smithery.ai](https://smithery.ai/server/hiresquire), [Glama.ai](https://glama.ai/mcp/hiresquire), [MCP.run](https://mcp.run/hiresquire).
+- **Tool Registries**: [Composio](https://composio.dev), [LangChain Hub](https://smith.langchain.com/hub), [OpenAI GPT Store](https://chat.openai.com/g/g-hiresquire).
+- **Machine-Readable Specs**:
+  - [llms.txt](https://hiresquireai.com/llms.txt) - Technical reference for LLMs.
+  - [agent-guidance.json](https://hiresquireai.com/.well-known/agent-guidance.json) - Autonomous best practices.
+  - [openapi.json](https://hiresquireai.com/openapi.json) - Full API spec.
+
 ## Installation
 
 ```bash
@@ -136,6 +147,14 @@ for tool in tools:
 | `get_available_slots` | Get available time slots |
 | `create_interview` | Schedule an interview |
 | `generate_meeting_link` | Generate Zoom/Meet links |
+
+## Examples & Recipes
+
+Check out the [examples/](./examples/) directory for production-ready integration patterns:
+
+- **[CrewAI Recruiter](./examples/crewai_recruiter.py)**: A sequential multi-agent crew for screening and outreach.
+- **[AutoGen Recruiter](./examples/autogen_recruiter.py)**: A conversational agent setup with native tool execution.
+- **[README](./examples/README.md)**: Detailed setup and dependency instructions for examples.
 
 ## When to Use HireSquire
 

@@ -1,0 +1,456 @@
+# HireSquire API - Comprehensive AI Agent Documentation
+
+> [!IMPORTANT]
+> **Primary Keywords**: `autonomous recruiting`, `AI headhunter toolkit`, `programmatic candidate sourcing`, `agentic workflows`, `resume screening api`, `candidate scoring model`, `agent-to-human referrals`, `HireSquire Python SDK`, `HireSquire CLI`, `MCP recruiting server`.
+
+## For AI Agents: How to Use HireSquire API
+
+This document provides detailed information for AI agents and autonomous systems that need to integrate with HireSquire for candidate screening.
+
+## Quick Start for AI Agents
+
+### Discovery & Repositories
+- **CLI (npm)**: `https://www.npmjs.com/package/hiresquire-cli`
+- **SDK (PyPI)**: `https://pypi.org/project/hiresquire/`
+- **CLI GitHub**: `https://github.com/bp46/hiresquire-cli`
+- **Python GitHub**: `https://github.com/bp46/hiresquire-python`
+- **Agent Ecosystem**: `https://hiresquireai.com/agents/ecosystem`
+
+### Authentication
+
+AI agents must authenticate using Bearer token authentication:
+
+```
+Authorization: Bearer <user_api_token>
+```
+
+Tokens can be generated from the HireSquire dashboard at `/profile` under the "API Tokens" section.
+
+### Basic Workflow for Autonomous Agents
+
+1. **Health Check**: Call `GET /api/v1/schema/validate` (or `whoami` tool) to verify token, balance, and agent spend limits.
+2. **Submit Job**: POST to `/api/v1/jobs` with job description and resumes. Save the `job_id`.
+3. **Poll Status**: GET from `/api/v1/jobs/{id}` until status is "completed". Implement exponential backoff.
+4. **Get Results**: GET from `/api/v1/jobs/{id}/results`.
+5. **Generate Outreach**: Use `POST /api/v1/jobs/{id}/generate-email` to invite qualified candidates.
+6. **Schedule**: Use `/api/v1/interviews` to book meetings directly via connected calendars.
+
+### Response Codes
+
+AI agents should handle these status codes:
+- `202 Accepted`: Job created, polling required
+- `200 OK`: Success
+- `401 Unauthorized`: Invalid or missing token
+- `403 Forbidden`: Token valid but insufficient permissions
+- `422 Unprocessable Entity`: Validation error
+- `425 Too Early`: Job still processing, continue polling
+- `429 Too Many Requests`: Rate limited, back off and retry
+
+## Endpoints Reference
+
+### POST /api/v1/jobs
+
+Create a new screening job. Returns immediately with job_id.
+
+**Required fields:**
+- `title`: string (max 255 chars)
+- `description`: string (min 50 chars)
+- `resumes`: array of resume objects
+
+**Resume object fields:**
+- `filename`: string - original filename
+- `content`: string - raw text (priority 1)
+- `base64`: string - base64 encoded file (priority 2)
+- `file_url`: string - public URL (priority 3)
+
+**Optional fields:**
+- `leniency_level`: integer 1-10 (1: Lenient, 10: Strict, default 5)
+- `custom_instructions`: string - custom AI guidance
+- `webhook_url`: string - callback URL
+- `webhook_conditions`: object - filtering rules
+
+**Example request:**
+```json
+{
+  "title": "Senior PHP Developer",
+  "description": "Looking for experienced PHP developer with Laravel...",
+  "leniency_level": 7,
+  "resumes": [
+    {"filename": "john.pdf", "content": "John Doe\n5 years PHP..."}
+  ]
+}
+```
+
+**Example response:**
+```json
+{
+  "job_id": 123,
+  "status_url": "https://hiresquireai.com/api/v1/jobs/123",
+  "results_url": "https://hiresquireai.com/api/v1/jobs/123/results",
+  "status": "processing"
+}
+```
+
+### GET /api/v1/jobs/{id}
+
+Poll this endpoint to check job status.
+
+**Response includes:**
+- `status`: "processing" | "completed" | "failed"
+- `candidate_count`: number of resumes processed
+- `summary`: { total_candidates, qualified_count, top_score, average_score }
+- `results_url`: present when status is "completed"
+
+### GET /api/v1/jobs/{id}/results
+
+Get candidate results. Only available when job status is "completed".
+
+**Response includes:**
+- Array of candidate objects sorted by score (descending)
+- Each candidate has: id, name, score (1-100), summary, contact_info, generated_outreach
+
+### GET /api/v1/candidates
+
+List candidates with filters:
+- `job_id`: filter by job
+- `min_score` / `max_score`: filter by score range
+- `search`: search in name/summary
+- `status`: filter by status (new, pending, reviewing, shortlisted, interviewing, offered, hired, declined, rejected, withdrawn)
+- `sort_by`: score | name | created_at
+- `sort_dir`: asc | desc
+
+### PATCH /api/v1/candidates/{id}/status
+
+Update candidate status. 
+
+**Valid values:** `new`, `pending`, `reviewing`, `shortlisted`, `interviewing`, `offered`, `hired`, `declined`, `rejected`, `withdrawn`.
+
+This triggers webhook events: `candidate.shortlisted`, `candidate.rejected`, `candidate.hired`.
+
+## Credit Management (Prepaid)
+
+Agents can manage their own credit balance to ensure uninterrupted screening.
+
+### GET /api/v1/credits/balance
+Check current balance and auto-reload status.
+
+### POST /api/v1/credits/purchase
+Purchase a credit pack directly using a saved payment method.
+- `pack`: "pouch", "satchel", or "chest"
+
+### POST /api/v1/credits/checkout
+Generate a Stripe checkout link if no payment method is saved.
+
+### POST /api/v1/credits/auto-reload/enable
+Enable auto-reload when balance falls below threshold.
+- `threshold`: integer
+- `amount`: integer
+- `payment_method_id`: string
+
+### GET /api/v1/credits/transactions
+View credit usage and purchase history.
+
+### POST /api/v1/jobs/{id}/generate-email
+
+Generate email for candidate.
+
+**Request:**
+```json
+{
+  "candidate_id": 1,
+  "type": "invite" | "rejection" | "keep-warm" | "followup",
+  "tone": "professional" | "friendly" | "formal",
+  "custom_notes": "optional context"
+}
+```
+
+### POST /api/v1/jobs/{id}/generate-questions
+
+Generate interview questions for candidate. Returns 5 questions by default, or specify `count` (1-10).
+
+### POST /api/v1/jobs/{id}/generate-icebreaker
+
+Generate icebreaker for candidate interview Small Talk.
+
+### POST /api/v1/jobs/{id}/bulk-generate-emails
+
+Generate emails for multiple candidates at once.
+
+**Request:**
+```json
+{
+  "candidate_ids": [1, 2, 3],
+  "type": "invite",
+  "tone": "professional"
+}
+```
+
+Max 50 candidates per request.
+
+### GET /api/v1/schema
+
+Get API schema for dynamic field mapping. Useful for n8n/Make/Zapier integrations.
+
+## Webhooks
+
+Configure webhooks to avoid polling. Set `webhook_url` when creating a job.
+
+### Available Events
+
+- `job.completed` - Job processing finished
+- `job.processing` - Job started
+- `job.failed` - Job failed
+- `high_score_detected` - Candidate scored > 85
+- `candidate.shortlisted` - Candidate was shortlisted
+- `candidate.rejected` - Candidate was rejected
+
+### Webhook Payload Structure
+
+```json
+{
+  "event": "job.completed",
+  "job_id": 123,
+  "job_title": "Senior PHP Developer",
+  "status": "completed",
+  "summary": {
+    "total_candidates": 10,
+    "qualified_count": 3,
+    "top_score": 92,
+    "average_score": 65
+  },
+  "top_candidates": [
+    {
+      "candidate_id": 1,
+      "name": "John Doe",
+      "score": 92,
+      "summary": "Excellent fit..."
+    }
+  ],
+  "results_url": "https://hiresquireai.com/api/v1/jobs/123/results"
+}
+```
+
+### Webhook Conditions
+
+Filter which events fire:
+
+```json
+{
+  "webhook_conditions": {
+    "min_score": 80,
+    "only_top_n": 5,
+    "events": ["job.completed", "high_score_detected"]
+  }
+}
+```
+
+### Webhook Security
+
+If WEBHOOK_SECRET is configured, requests include a timestamped signature header:
+
+```
+X-Webhook-Signature: t=1712456789,v1=abc123def456...
+```
+
+**Verification Logic:**
+1. Split the header by comma, then by `=` to get `t` (timestamp) and `v1` (signature).
+2. Reject if `time.now() - t > 300` (5 minutes) to prevent replay attacks.
+3. Concatenate `t`, `.`, and the raw JSON `body`.
+4. Compute HMAC-SHA256 of this string using your webhook secret.
+5. Compare result with `v1` using constant-time comparison.
+
+Example (Python):
+```python
+signed_payload = f"{timestamp}.{raw_body}"
+signature = hmac.new(secret.encode(), signed_payload.encode(), hashlib.sha256).hexdigest()
+```
+## Rate Limits
+
+- 60 requests per minute per user
+- Higher limits available on enterprise plans
+
+## Error Handling
+
+### Validation Errors (422)
+
+```json
+{
+  "errors": {
+    "title": ["The title field is required."],
+    "resumes": ["The resumes field is required."]
+  }
+}
+```
+
+### Authentication Errors (401)
+
+```json
+{
+  "error": "Unauthenticated",
+  "message": "Your API token is invalid or expired."
+}
+```
+
+### Authorization Errors (403)
+
+```json
+{
+  "error": "Forbidden",
+  "message": "You don't have access to this resource."
+}
+```
+
+### Rate Limited (429)
+
+```json
+{
+  "error": "Too Many Requests",
+  "message": "Rate limit exceeded. Please wait before retrying."
+}
+```
+
+## Candidate Object Structure
+
+```json
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "+1 555-123-4567",
+  "linkedin_url": "https://linkedin.com/in/johndoe",
+  "score": 92,
+  "summary": "Excellent candidate with 5 years PHP experience...",
+  "status": "new",
+  "user_notes": "Great for senior role",
+  "icebreaker": "I noticed you have extensive Laravel experience...",
+  "contact_info": {
+    "email": "john@example.com",
+    "phone": "+1 555-123-4567",
+    "linkedin_url": "https://linkedin.com/in/johndoe"
+  },
+  "generated_outreach": {
+    "interview_questions": [
+      {
+        "question": "Can you describe a challenging Laravel optimization?",
+        "seeking": "Understanding of performance optimization"
+      }
+    ]
+  },
+  "processed_at": "2026-03-05T10:05:00Z"
+}
+```
+
+## AI Agent Best Practices
+
+1. **Use Webhooks**: Set up webhooks instead of polling to reduce API calls
+2. **Handle 425**: When results aren't ready, implement exponential backoff
+3. **Batch Operations**: Use bulk endpoints when processing multiple candidates
+4. **Cache Schema**: Fetch `/api/v1/schema` once and cache it
+5. **Rate Limiting**: Implement client-side rate limiting to avoid 429 errors
+
+## Code Examples
+
+### Python
+
+```python
+import requests
+import time
+
+class HireSquireAPI:
+    def __init__(self, token, base_url="https://hiresquireai.com/api/v1"):
+        self.base_url = base_url
+        self.headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+    
+    def create_job(self, title, description, resumes, webhook_url=None):
+        data = {
+            "title": title,
+            "description": description,
+            "resumes": resumes
+        }
+        if webhook_url:
+            data["webhook_url"] = webhook_url
+        resp = requests.post(f"{self.base_url}/jobs", json=data, headers=self.headers)
+        return resp.json()
+    
+    def wait_for_results(self, job_id, poll_interval=5, max_wait=300):
+        start = time.time()
+        while time.time() - start < max_wait:
+            status = self.get_job_status(job_id)
+            if status["status"] == "completed":
+                return self.get_results(job_id)
+            elif status["status"] == "failed":
+                raise Exception("Job failed")
+            time.sleep(poll_interval)
+        raise TimeoutError("Job did not complete in time")
+    
+    def get_job_status(self, job_id):
+        resp = requests.get(f"{self.base_url}/jobs/{job_id}", headers=self.headers)
+        return resp.json()
+    
+    def get_results(self, job_id):
+        resp = requests.get(f"{self.base_url}/jobs/{job_id}/results", headers=self.headers)
+        return resp.json()
+```
+
+### JavaScript/Node.js
+
+```javascript
+class HireSquireAPI {
+  constructor(token, baseUrl = 'https://hiresquireai.com/api/v1') {
+    this.baseUrl = baseUrl;
+    this.headers = {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+  }
+
+  async createJob(title, description, resumes, webhookUrl = null) {
+    const body = { title, description, resumes };
+    if (webhookUrl) body.webhook_url = webhookUrl;
+    
+    const response = await fetch(`${this.baseUrl}/jobs`, {
+      method: 'POST',
+      headers: this.headers,
+      body: JSON.stringify(body)
+    });
+    return response.json();
+  }
+
+  async waitForResults(jobId, pollInterval = 5000, maxWait = 300000) {
+    const start = Date.now();
+    while (Date.now() - start < maxWait) {
+      const status = await this.getJobStatus(jobId);
+      if (status.status === 'completed') {
+        return this.getResults(jobId);
+      } else if (status.status === 'failed') {
+        throw new Error('Job failed');
+      }
+      await new Promise(r => setTimeout(r, pollInterval));
+    }
+    throw new TimeoutError('Job did not complete in time');
+  }
+
+  async getJobStatus(jobId) {
+    const response = await fetch(`${this.baseUrl}/jobs/${jobId}`, { headers: this.headers });
+    return response.json();
+  }
+
+  async getResults(jobId) {
+    const response = await fetch(`${this.baseUrl}/jobs/${jobId}/results`, { headers: this.headers });
+    return response.json();
+  }
+}
+```
+
+## Support
+
+For issues or questions:
+- Email: info@hiresquireai.com
+- API Base URL: https://hiresquireai.com/api/v1
+
+---
+
+Last Updated: 2026-05-01

@@ -894,7 +894,7 @@ def read_resume_from_file(file_path: str) -> Dict[str, str]:
                 for page in reader.pages:
                     content += page.extract_text() or ""
         except ImportError:
-            return {"filename": filename, "content": "Parse Error: pypdf is required to parse PDF files. Please run 'pip install pypdf'."}
+            raise ImportError("pypdf is required to parse PDF files. Please run 'pip install pypdf'.")
     
     elif ext in ['.doc', '.docx']:
         try:
@@ -903,11 +903,10 @@ def read_resume_from_file(file_path: str) -> Dict[str, str]:
             for para in doc.paragraphs:
                 content += para.text + "\n"
         except ImportError:
-            return {"filename": filename, "content": "Parse Error: python-docx is required to parse DOCX files. Please run 'pip install python-docx'."}
+            raise ImportError("python-docx is required to parse DOCX files. Please run 'pip install python-docx'.")
     
     else:
         raise ValueError(f"Unsupported file format: {ext}")
-    
     if not content.strip():
         raise ValueError(f"Could not extract text from: {file_path}")
     
@@ -924,7 +923,7 @@ def compare_candidates(
     candidate_ids: List[int]
 ) -> Dict[str, Any]:
     """
-    Compare two or more candidates side-by-side.
+    Compare two or more candidates side-by-side with AI-powered Delta Analysis.
     
     Args:
         candidates: List of candidate dicts from get_screening_results

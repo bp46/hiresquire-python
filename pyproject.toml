@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hiresquire"
-version = "1.2.3"
+version = "1.2.4"
 description = "HireSquire SDK - AI-powered candidate screening for agents and humans"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [
     {name = "HireSquire Team", email = "info@hiresquireai.com"}
 ]
-keywords = ["hiresquire", "langchain", "autogen", "crewai", "ai", "hiring", "recruitment", "screening", "resume", "mcp", "autonomous-agent", "ai-agent", "hr", "candidate-scoring", "interview-scheduling"]
+keywords = ["hiresquire", "langchain", "autogen", "crewai", "ai", "hiring", "recruitment", "screening", "resume", "mcp", "autonomous-agent", "ai-agent", "hr", "candidate-scoring", "interview-scheduling", "tool", "sdk"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
