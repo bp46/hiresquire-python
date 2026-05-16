@@ -139,6 +139,7 @@ for tool in tools:
 | `get_credit_balance` | Check current credit balance |
 | `estimate_screening_cost` | Estimate cost for N candidates |
 | `list_credit_packs` | List available credit packs |
+| `purchase_credits` | Purchase credits with saved payment method |
 | `get_credit_transactions` | View credit transaction history |
 | `enable_auto_reload` | Enable automatic credit reloading |
 | `disable_auto_reload` | Disable automatic credit reloading |
@@ -180,8 +181,13 @@ import os
 client = HireSquire(os.environ["HIRESQUIRE_API_TOKEN"])
 
 # 1. Check credits before starting
-balance = client.credits.balance()
+balance = client.credits.get_balance()
 print(f"Balance: {balance['formatted_balance']}")
+
+# 2. Purchase credits if low (optional)
+if balance['balance'] < 10:
+    client.credits.purchase(pack="satchel", payment_method_id="pm_123")
+
 
 # 2. Screen candidates
 job = client.screen(

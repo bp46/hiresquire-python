@@ -95,7 +95,7 @@ def _get_headers(token: Optional[str] = None, idempotency_key: Optional[str] = N
     headers = {
         "Authorization": f"Bearer {api_token}",
         "Content-Type": "application/json",
-        "User-Agent": "HireSquirePythonSDK/1.2.4"
+        "User-Agent": "HireSquirePythonSDK/1.2.5"
     }
     
     if idempotency_key:
@@ -709,6 +709,7 @@ def purchase_credits(
     amount: Optional[float] = None,
     pack: Optional[str] = None,
     payment_method_id: Optional[str] = None,
+    idempotency_key: Optional[str] = None,
     api_token: Optional[str] = None,
     base_url: Optional[str] = None
 ) -> Dict[str, Any]:
@@ -738,11 +739,14 @@ def purchase_credits(
     if pack:
         payload["pack"] = str(pack)
     
+    # Generate idempotency key for the purchase
+    ikey = idempotency_key or str(uuid.uuid4())
+
     def _make_request():
         response = requests.post(
             f"{_get_base_url(base_url)}/credits/purchase",
             json=payload,
-            headers=_get_headers(api_token),
+            headers=_get_headers(api_token, idempotency_key=ikey),
             timeout=30
         )
         response.raise_for_status()
