@@ -59,7 +59,7 @@ from .tools import (
 import os
 from typing import Optional, List, Dict, Any, Union
 
-__version__ = "1.2.3"
+__version__ = "1.2.4"
 
 def _unwrap(func_or_tool):
     """Unwrap LangChain tool to underlying function, handling mocks safely."""

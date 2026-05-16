@@ -10,7 +10,7 @@ Python SDK for HireSquire's AI-powered candidate screening API. Includes native 
 
 HireSquire is built natively for AI agents. Integrate HireSquire into your agentic workflows via these canonical sources:
 
-- **MCP Hubs**: [Smithery.ai](https://smithery.ai/server/hiresquire), [Glama.ai](https://glama.ai/mcp/hiresquire), [MCP.run](https://mcp.run/hiresquire).
+- **MCP Hubs**: [Smithery.ai](https://smithery.ai/servers/bparrish46/hiresquire-ai), [Glama.ai](https://glama.ai/mcp/connectors/com.hiresquireai/hire-squire-agent-ecosystem), [MCP.run](https://mcp.run/hiresquire).
 - **Tool Registries**: [Composio](https://composio.dev), [LangChain Hub](https://smith.langchain.com/hub), [OpenAI GPT Store](https://chat.openai.com/g/g-hiresquire).
 - **Machine-Readable Specs**:
   - [llms.txt](https://hiresquireai.com/llms.txt) - Technical reference for LLMs.
